@@ -1,0 +1,40 @@
+{
+  "name": "fevi-bot",
+  "version": "0.1.0",
+  "description": "Google Analytics bot via LINE API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": "6.2.0"
+  },
+  "keywords": [
+    "nodejs",
+    "line",
+    "linebot"
+  ],
+  "author": "dusskapark",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "crypto-js": "^3.1.8",
+    "express": "^4.14.0",
+    "line-bot-sdk": "^0.1.4",
+    "lodash": "^4.16.1",
+    "node-twitter-korean-text": "^1.0.3",
+    "request": "^2.75.0",
+    "request-promise": "^4.1.1",
+    "simple-json-filter": "^0.3.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dusskapark/fevi-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dusskapark/fevi-bot/issues"
+  },
+  "homepage": "https://github.com/dusskapark/fevi-bot#readme"
+}
