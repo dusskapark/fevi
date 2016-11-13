@@ -123,6 +123,10 @@ app.get('/ping', function(req, res) {
     res.end();
 });
 
+app.get('/hello', function(req, res){
+  res.send('it works!');
+});
+
 app.post('/webhook', verifyRequest, function(req, res) {
     var result = req.body.events;
     if (!result || !result.length) {
