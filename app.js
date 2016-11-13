@@ -3,13 +3,15 @@ var request = require('request');
 var bodyParser = require('body-parser');
 var CryptoJS = require("crypto-js");
 var config = require('./key.js');
-var simpleJSONFilter = require("simple-json-filter");
-var sjf = new simpleJSONFilter();
-var filter = {
-    koreanPos: 'Noun'
-};
+var mecab = require('mecab-ya');
+
+// var simpleJSONFilter = require("simple-json-filter");
+// var sjf = new simpleJSONFilter();
+// var filter = {
+//     koreanPos: 'Noun'
+// };
 var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사용한다.
-var TwitterKoreanProcessor = require('node-twitter-korean-text');
+// var TwitterKoreanProcessor = require('node-twitter-korean-text');
 
 
 var app = express();
@@ -29,80 +31,6 @@ function verifyRequest(req, res, next) {
 }
 
 // FEVI 서버에서 데이터를 수집한다.
-function search(keyword, callback) {
-    console.log(keyword);
-
-    var options = {
-        uri: 'http://munsangdong.cafe24.com/api/card',
-        qs: {
-            keyword: keyword
-        },
-        headers: {
-            'User-Agent': 'Request-Promise'
-        },
-        json: true // Automatically parses the JSON string in the response
-    };
-
-    rp(options)
-        .then(function(repos) {
-            var json = repos.content[0];
-            var search_result = {};
-
-            callback(json)
-
-        })
-        .catch(function(err) {
-            // API call failed...
-            console.log(err);
-        });
-}
-
-
-app.post('/webhook', verifyRequest, function(req, res) {
-    var result = req.body.events;
-    if (!result || !result.length) {
-        res.status(470).end();
-        return;
-    }
-    res.status(200).end();
-
-    // One request may have serveral contents in an array.
-    var content = result[0];
-    // source
-    var source = content.source;
-    // Content type would be possibly text/image/video/audio/gps/sticker/contact.
-    var type = content.type;
-    // assume it's text type here.
-    var timestamp = content.timestamp;
-
-    var replyToken = content.replyToken;
-
-    var message = content.message;
-
-    TwitterKoreanProcessor.tokenize(message.text)
-        .then((tokens) => TwitterKoreanProcessor.stem(tokens))
-        .then((stemmed) => TwitterKoreanProcessor.tokensToJsonArray(stemmed))
-        // .then((stemmed) => TwitterKoreanProcessor.extractPhrasesSync(stemmed, true, false))
-        .then((results) => {
-            var result = sjf.wantArray().exec(filter, results);
-            var randomIndex = Math.floor(Math.random() * result.length);
-            var keyword = result[randomIndex].text;
-
-            sendMsg(replyToken, keyword,
-                function(err) {
-                    if (err) {
-                        // sending message failed
-                        return;
-                    }
-                    // message sent
-                });
-
-        }, function onError(err) {
-            console.error(err);
-        });
-
-});
-
 function sendMsg(replyToken, keyword, callback) {
     console.log(keyword);
 
@@ -185,6 +113,90 @@ function sendMsg(replyToken, keyword, callback) {
         });
 
 }
+
+app.post('/webhook', verifyRequest, function(req, res) {
+    var result = req.body.events;
+    if (!result || !result.length) {
+        res.status(470).end();
+        return;
+    }
+    res.status(200).end();
+
+    // One request may have serveral contents in an array.
+    var content = result[0];
+    // source
+    var source = content.source;
+    // Content type would be possibly text/image/video/audio/gps/sticker/contact.
+    var type = content.type;
+    // assume it's text type here.
+    var timestamp = content.timestamp;
+
+    var replyToken = content.replyToken;
+
+    var message = content.message;
+
+    var text = content.message.text;
+
+    console.log(text);
+
+    //  아버지가 방에 들어가신다. >> [ '아버지', '방' ]
+    mecab.nouns(text, function(err, result) {
+
+        console.log(err, result);
+
+        if (result.length > 0) {
+            var randomIndex = Math.floor(Math.random() * result.length);
+            var keyword = result[randomIndex];
+
+            sendMsg(replyToken, keyword,
+                function(err) {
+                    if (err) {
+                        // sending message failed
+                        return;
+                    }
+                    // message sent
+                });
+        } else {
+            var keyword = result[0];
+
+            sendMsg(replyToken, keyword,
+                function(err) {
+                    if (err) {
+                        // sending message failed
+                        return;
+                    }
+                    // message sent
+                });
+        }
+    });
+});
+
+
+// TwitterKoreanProcessor.tokenize(message.text)
+//     .then((tokens) => TwitterKoreanProcessor.stem(tokens))
+//     .then((stemmed) => TwitterKoreanProcessor.tokensToJsonArray(stemmed))
+// .then((stemmed) => TwitterKoreanProcessor.extractPhrasesSync(stemmed, true, false))
+// .then((results) => {
+//     var result = sjf.wantArray().exec(filter, results);
+//     var randomIndex = Math.floor(Math.random() * result.length);
+//     var keyword = result[randomIndex].text;
+//
+//     sendMsg(replyToken, keyword,
+//         function(err) {
+//             if (err) {
+//                 // sending message failed
+//                 return;
+//             }
+//             // message sent
+//         });
+//
+// }, function onError(err) {
+//     console.error(err);
+// });
+
+// });
+
+
 
 app.listen(app.get('port'), function() {
     console.log('Listening on port ' + app.get('port'));
