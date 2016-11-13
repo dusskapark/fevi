@@ -15,7 +15,7 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 
 
 var app = express();
-app.set('port', process.env.PORT || 3003);
+app.set('port', process.env.PORT || 443);
 
 app.use(bodyParser.json());
 
