@@ -114,6 +114,15 @@ function sendMsg(replyToken, keyword, callback) {
 
 }
 
+app.get('/ping', function(req, res) {
+    response.writeHead(200, {
+        'Content-Type': 'text/plain',
+        'Content-Length': 2
+    });
+    response.write('OK');
+    response.end();
+});
+
 app.post('/webhook', verifyRequest, function(req, res) {
     var result = req.body.events;
     if (!result || !result.length) {
