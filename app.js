@@ -15,7 +15,7 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 
 
 var app = express();
-app.set('port', process.env.PORT || 443);
+app.set('port', process.env.PORT || 3003);
 
 app.use(bodyParser.json());
 
@@ -140,7 +140,7 @@ app.post('/webhook', verifyRequest, function(req, res) {
     console.log(text);
 
     //  아버지가 방에 들어가신다. >> [ '아버지', '방' ]
-    mecab.nouns(text, function(err, result) {
+    mecab.nouns(text[0], function(err, result) {
 
         console.log(err, result);
 
