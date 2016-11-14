@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var CryptoJS = require("crypto-js");
 var config = require('./key.js');
 var mecab = require('mecab-ya');
-
+var letsencrypt = require('letsencrypt-express')
 // var simpleJSONFilter = require("simple-json-filter");
 // var sjf = new simpleJSONFilter();
 // var filter = {
@@ -16,8 +16,20 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 
 var app = express();
 app.set('port', process.env.PORT || 3003);
-
 app.use(bodyParser.json());
+
+
+
+letsencrypt.create({
+    server: 'https://acme-staging.api.letsencrypt.org/directory',
+    email: 'dusskapark@gmail.com',
+    agreeTos: true,
+    approveDomains: 'ec2-52-78-228-8.ap-northeast-2.compute.amazonaws.com',
+    app: app.use('/', function(req, res) {
+        res.end('Hello, World!');
+    })
+}).listen(80, 443);
+
 
 function verifyRequest(req, res, next) {
 console.log('verifyreq');
