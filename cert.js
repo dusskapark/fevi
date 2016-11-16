@@ -11,7 +11,7 @@ require('letsencrypt-express').create({
     agreeTos: true
 
     ,
-    approveDomains: ['ec2-52-78-228-8.ap-northeast-2.compute.amazonaws.com']
+    approveDomains: ['bot.metadata.co.kr']
 
     ,
     app: require('express')().use('/', function(req, res) {
