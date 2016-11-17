@@ -15,11 +15,11 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 var TwitterKoreanProcessor = require('node-twitter-korean-text');
 
 
-// var https_options = {
-//     ca: fs.readFileSync('ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
-//     key: fs.readFileSync('ssl/metadata.key', 'utf8'),
-//     cert: fs.readFileSync('ssl/bot_metadata_co_kr.crt', 'utf8')
-// }
+var https_options = {
+    ca: fs.readFileSync('ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
+    key: fs.readFileSync('ssl/metadata.key', 'utf8'),
+    cert: fs.readFileSync('ssl/bot_metadata_co_kr.crt', 'utf8')
+}
 
 var app = express();
 app.set('port', process.env.PORT || 3003);
