@@ -1,3 +1,5 @@
+var https = require('https');
+var fs = require('fs');
 var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
@@ -13,13 +15,18 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 // var TwitterKoreanProcessor = require('node-twitter-korean-text');
 
 
+var https_options = {
+    ca: fs.readFileSync('/ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
+    key: fs.readFileSync('/ssl/metadata.key', 'utf8'),
+    cert: fs.readFileSync('ssl/bot_metadata_co_kr.crt', 'utf8')
+}
+
 var app = express();
-app.set('port', process.env.PORT || 3003);
 app.use(bodyParser.json());
 
 
 function verifyRequest(req, res, next) {
-console.log('verifyreq');
+    console.log('verifyreq');
     var channelSignature = req.get('X-Line-Signature');
     var sha256 = CryptoJS.HmacSHA256(JSON.stringify(req.body), config.channelSecret);
     var base64encoded = CryptoJS.enc.Base64.stringify(sha256);
@@ -123,12 +130,12 @@ app.get('/ping', function(req, res) {
     res.end();
 });
 
-app.get('/hello', function(req, res){
-  res.send('it works!');
+app.get('/hello', function(req, res) {
+    res.send('it works!');
 });
 
 app.post('/webhook', verifyRequest, function(req, res) {
-console.log('imhere');
+    console.log('imhere');
     var result = req.body.events;
     if (!result || !result.length) {
         res.status(470).end();
@@ -212,6 +219,6 @@ console.log('imhere');
 
 
 
-app.listen(app.get('port'), function() {
-    console.log('Listening on port ' + app.get('port'));
+https.createServer(https_options, app).listen(443, function() {
+    console.log('Listening on port 443');
 });
