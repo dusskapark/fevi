@@ -15,11 +15,11 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 var TwitterKoreanProcessor = require('node-twitter-korean-text');
 
 
-var https_options = {
-    ca: fs.readFileSync('ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
-    key: fs.readFileSync('ssl/metadata.key', 'utf8'),
-    cert: fs.readFileSync('ssl/bot_metadata_co_kr.crt', 'utf8')
-}
+// var https_options = {
+//     ca: fs.readFileSync('ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
+//     key: fs.readFileSync('ssl/metadata.key', 'utf8'),
+//     cert: fs.readFileSync('ssl/bot_metadata_co_kr.crt', 'utf8')
+// }
 
 var app = express();
 app.set('port', process.env.PORT || 3003);
@@ -159,31 +159,32 @@ app.post('/webhook', verifyRequest, function(req, res) {
 
     var text = content.message.text;
 
-    console.log(text);
+    // console.log(text);
 
-    TwitterKoreanProcessor.tokenize(message.text)
+    TwitterKoreanProcessor.normalize(text)
+        .then((results) => TwitterKoreanProcessor.tokenize(results))
         .then((tokens) => TwitterKoreanProcessor.stem(tokens))
-        .then((stemmed) => TwitterKoreanProcessor.tokensToJsonArray(stemmed))
-        .then((stemmed) => TwitterKoreanProcessor.extractPhrasesSync(stemmed, true, false))
+        .then((stemmed) => TwitterKoreanProcessor.tokensToJsonArray(stemmed, false))
         .then((results) => {
-            var result = sjf.wantArray().exec(filter, results);
-            var randomIndex = Math.floor(Math.random() * result.length);
-            var keyword = result[randomIndex].text;
 
-            sendMsg(replyToken, keyword,
-                function(err) {
-                    if (err) {
-                        // sending message failed
-                        return;
-                    }
-                    // message sent
-                });
+                var result = sjf.wantArray().exec(filter, results);
+                var randomIndex = Math.floor(Math.random() * result.length);
+                var keyword = result[randomIndex].text;
+                sendMsg(replyToken, keyword,
+                    function(err) {
+                        if (err) {
+                            // sending message failed
+                            return;
+                        }
+                        // message sent
+                    });
 
-        }, function onError(err) {
-            console.error(err);
-        });
-
+            },
+            function onError(err) {
+                console.error(err);
+            });
 });
+
 
 //  아버지가 방에 들어가신다. >> [ '아버지', '방' ]
 //     mecab.nouns(text[0], function(err, result) {
@@ -218,8 +219,11 @@ app.post('/webhook', verifyRequest, function(req, res) {
 // });
 
 
-
-
-https.createServer(https_options, app).listen(app.get('port'), function() {
+app.listen(app.get('port'), function() {
     console.log('Listening on port ' + app.get('port'));
 });
+//
+//
+// https.createServer(https_options, app).listen(app.get('port'), function() {
+//     console.log('Listening on port ' + app.get('port'));
+// });
