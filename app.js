@@ -219,11 +219,9 @@ app.post('/webhook', verifyRequest, function(req, res) {
 // });
 
 
-app.listen(app.get('port'), function() {
+
+
+
+https.createServer(https_options, app).listen(app.get('port'), function() {
     console.log('Listening on port ' + app.get('port'));
 });
-//
-//
-// https.createServer(https_options, app).listen(app.get('port'), function() {
-//     console.log('Listening on port ' + app.get('port'));
-// });
