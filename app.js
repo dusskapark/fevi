@@ -16,12 +16,13 @@ var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사
 
 
 var https_options = {
-    ca: fs.readFileSync('/ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
-    key: fs.readFileSync('/ssl/metadata.key', 'utf8'),
+    ca: fs.readFileSync('ssl/bot_metadata_co_kr.ca-bundle', 'utf8'),
+    key: fs.readFileSync('ssl/metadata.key', 'utf8'),
     cert: fs.readFileSync('ssl/bot_metadata_co_kr.crt', 'utf8')
 }
 
 var app = express();
+app.set('port', process.env.PORT || 3003);
 app.use(bodyParser.json());
 
 
@@ -219,6 +220,6 @@ app.post('/webhook', verifyRequest, function(req, res) {
 
 
 
-https.createServer(https_options, app).listen(443, function() {
-    console.log('Listening on port 443');
+https.createServer(https_options, app).listen(app.get('port'), function() {
+    console.log('Listening on port ' + app.get('port'));
 });
