@@ -27,7 +27,6 @@ app.use(bodyParser.json());
 
 
 function verifyRequest(req, res, next) {
-    console.log('verifyreq');
     var channelSignature = req.get('X-Line-Signature');
     var sha256 = CryptoJS.HmacSHA256(JSON.stringify(req.body), config.channelSecret);
     var base64encoded = CryptoJS.enc.Base64.stringify(sha256);
@@ -136,7 +135,6 @@ app.get('/hello', function(req, res) {
 });
 
 app.post('/webhook', verifyRequest, function(req, res) {
-    console.log('imhere');
     var result = req.body.events;
     if (!result || !result.length) {
         res.status(470).end();
