@@ -5,14 +5,14 @@ var request = require('request');
 var bodyParser = require('body-parser');
 var CryptoJS = require("crypto-js");
 var config = require('./key.js');
-var mecab = require('mecab-ya');
-// var simpleJSONFilter = require("simple-json-filter");
-// var sjf = new simpleJSONFilter();
-// var filter = {
-//     koreanPos: 'Noun'
-// };
+// var mecab = require('mecab-ya');
+var simpleJSONFilter = require("simple-json-filter");
+var sjf = new simpleJSONFilter();
+var filter = {
+    koreanPos: 'Noun'
+};
 var rp = require('request-promise'); // 페비 서버에 ajax 콜을 할 때 사용한다.
-// var TwitterKoreanProcessor = require('node-twitter-korean-text');
+var TwitterKoreanProcessor = require('node-twitter-korean-text');
 
 
 var https_options = {
@@ -161,14 +161,14 @@ app.post('/webhook', verifyRequest, function(req, res) {
 
     console.log(text);
 
-    //  아버지가 방에 들어가신다. >> [ '아버지', '방' ]
-    mecab.nouns(text[0], function(err, result) {
-
-        console.log(err, result);
-
-        if (result.length > 0) {
+    TwitterKoreanProcessor.tokenize(message.text)
+        .then((tokens) => TwitterKoreanProcessor.stem(tokens))
+        .then((stemmed) => TwitterKoreanProcessor.tokensToJsonArray(stemmed))
+        .then((stemmed) => TwitterKoreanProcessor.extractPhrasesSync(stemmed, true, false))
+        .then((results) => {
+            var result = sjf.wantArray().exec(filter, results);
             var randomIndex = Math.floor(Math.random() * result.length);
-            var keyword = result[randomIndex];
+            var keyword = result[randomIndex].text;
 
             sendMsg(replyToken, keyword,
                 function(err) {
@@ -178,45 +178,45 @@ app.post('/webhook', verifyRequest, function(req, res) {
                     }
                     // message sent
                 });
-        } else {
-            var keyword = result[0];
 
-            sendMsg(replyToken, keyword,
-                function(err) {
-                    if (err) {
-                        // sending message failed
-                        return;
-                    }
-                    // message sent
-                });
-        }
-    });
+        }, function onError(err) {
+            console.error(err);
+        });
+
 });
 
-
-// TwitterKoreanProcessor.tokenize(message.text)
-//     .then((tokens) => TwitterKoreanProcessor.stem(tokens))
-//     .then((stemmed) => TwitterKoreanProcessor.tokensToJsonArray(stemmed))
-// .then((stemmed) => TwitterKoreanProcessor.extractPhrasesSync(stemmed, true, false))
-// .then((results) => {
-//     var result = sjf.wantArray().exec(filter, results);
-//     var randomIndex = Math.floor(Math.random() * result.length);
-//     var keyword = result[randomIndex].text;
+//  아버지가 방에 들어가신다. >> [ '아버지', '방' ]
+//     mecab.nouns(text[0], function(err, result) {
 //
-//     sendMsg(replyToken, keyword,
-//         function(err) {
-//             if (err) {
-//                 // sending message failed
-//                 return;
-//             }
-//             // message sent
-//         });
+//         console.log(err, result);
 //
-// }, function onError(err) {
-//     console.error(err);
+//         if (result.length > 0) {
+//             var randomIndex = Math.floor(Math.random() * result.length);
+//             var keyword = result[randomIndex];
+//
+//             sendMsg(replyToken, keyword,
+//                 function(err) {
+//                     if (err) {
+//                         // sending message failed
+//                         return;
+//                     }
+//                     // message sent
+//                 });
+//         } else {
+//             var keyword = result[0];
+//
+//             sendMsg(replyToken, keyword,
+//                 function(err) {
+//                     if (err) {
+//                         // sending message failed
+//                         return;
+//                     }
+//                     // message sent
+//                 });
+//         }
+//     });
 // });
 
-// });
 
 
 
