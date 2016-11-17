@@ -22,11 +22,11 @@
     "crypto-js": "^3.1.8",
     "express": "^4.14.0",
     "lodash": "^4.16.1",
-    "mecab-ya": "git+https://github.com/golbin/node-mecab-ya.git",
     "node-twitter-korean-text": "^1.0.3",
     "q": "^1.4.1",
     "request": "^2.75.0",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "simple-json-filter": "^0.3.0"
   },
   "devDependencies": {},
   "repository": {
